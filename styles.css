@@ -9,24 +9,32 @@
   max-width: 400px;
   max-height: 400px;
   overflow-y: auto;
-  background: var(--modal-background, var(--background-primary));
+  background: var(--background-primary);
   border: 1px solid var(--modal-border-color, var(--background-modifier-border));
-  border-radius: var(--modal-radius, var(--radius-m));
+  border-radius: var(--radius-l, 12px);
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
   z-index: var(--layer-popover, 100);
+  padding: var(--size-4-2) 0;
 }
 
 .plugin-toggle-popup .setting-item {
-  padding: var(--size-4-1) var(--size-4-2);
+  padding: var(--size-4-1) var(--size-4-4);
   border-bottom: none;
+  background: transparent;
 }
 
 .plugin-toggle-popup .setting-item-name {
-  font-size: var(--font-ui-small);
+  font-size: var(--font-ui-medium);
 }
 
 .plugin-toggle-popup .setting-item-description {
   display: none;
+}
+
+.plugin-toggle-popup.keyboard-nav .checkbox-container:focus {
+  outline: 3px solid var(--interactive-accent);
+  outline-offset: 3px;
+  border-radius: var(--radius-s);
 }
 
 .plugin-toggle-settings-desc {
@@ -40,7 +48,7 @@
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  margin-right: var(--size-4-2);
+  margin-right: var(--size-4-1);
   align-self: center;
   flex-shrink: 0;
 }

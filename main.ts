@@ -145,7 +145,7 @@ class PluginTogglePopup {
 
       const isEnabled = enabledPlugins.has(id);
 
-      new Setting(this.containerEl)
+      const setting = new Setting(this.containerEl)
         .setName(manifest.name || id)
         .addToggle((toggle) =>
           toggle
@@ -157,9 +157,36 @@ class PluginTogglePopup {
               } else {
                 await plugins.disablePluginAndSave(id);
               }
+              setting.settingEl.removeClass('plugin-toggle-enabled');
+              setting.settingEl.removeClass('plugin-toggle-disabled');
+              setting.settingEl.addClass(value ? 'plugin-toggle-enabled' : 'plugin-toggle-disabled');
             }),
         );
+
+      if (isEnabled) {
+        setting.settingEl.addClass('plugin-toggle-enabled');
+      } else {
+        setting.settingEl.addClass('plugin-toggle-disabled');
+      }
     }
+
+    setTimeout(() => {
+      const firstToggle = this.containerEl.querySelector('.checkbox-container');
+      (firstToggle as HTMLElement)?.focus();
+    }, 0);
+
+    this.containerEl.addEventListener('keydown', (e) => {
+      if (e.key !== 'ArrowDown' && e.key !== 'ArrowUp' && e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+      e.preventDefault();
+      this.containerEl.addClass('keyboard-nav');
+      const toggles = this.containerEl.querySelectorAll('.checkbox-container');
+      if (toggles.length === 0) return;
+      const idx = Array.from(toggles).indexOf(document.activeElement as HTMLElement);
+      const next = e.key === 'ArrowDown'
+        ? (idx + 1) % toggles.length
+        : (idx - 1 + toggles.length) % toggles.length;
+      (toggles[next] as HTMLElement)?.focus();
+    });
 
     this.closeHandler = (e: MouseEvent) => {
       if (this.containerEl && !this.containerEl.contains(e.target as Node)) {

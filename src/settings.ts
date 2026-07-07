@@ -31,7 +31,7 @@ export class PluginToggleSettingTab extends PluginSettingTab {
     const enabledPlugins = (this.app as any).plugins.enabledPlugins as Set<string>;
 
     Object.entries(manifests)
-      .filter(([id]) => id !== 'plugin-toggle')
+      .filter(([id]) => id !== 'obsidian-plugin-toggle')
       .sort(([, a], [, b]) => a.name.localeCompare(b.name))
       .forEach(([id, manifest]) => {
         const isEnabled = enabledPlugins.has(id);

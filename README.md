@@ -20,18 +20,18 @@ Select the toggle next to a plugin to enable or disable it.
 ## Keyboard shortcut
 
 1. Open **Settings → Hotkeys**.
-2. Search for **Open plugin toggle overlay**.
+2. Search for **Open overlay**.
 3. Assign your preferred shortcut, for example `Ctrl+Shift+T`.
 
 ## Installation
 
-1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/hmnijp/plugin-toggle/releases).
-2. Copy them to `VaultFolder/.obsidian/plugins/plugin-toggle/`.
+1. Download `main.js`, `manifest.json`, and `styles.css` from the [latest release](https://github.com/hmnijp/obsidian-plugin-toggle/releases).
+2. Copy them to `VaultFolder/.obsidian/plugins/obsidian-plugin-toggle/`.
 3. Enable the plugin in **Settings → Community plugins**.
 
 ### BRAT
 
-If you have the [BRAT](https://obsidian.md/plugins?id=obsidian42-brat) plugin installed, add `https://github.com/hmnijp/plugin-toggle` to the list of beta plugins.
+If you have the [BRAT](https://obsidian.md/plugins?id=obsidian42-brat) plugin installed, add `https://github.com/hmnijp/obsidian-plugin-toggle` to the list of beta plugins.
 
 ---
 

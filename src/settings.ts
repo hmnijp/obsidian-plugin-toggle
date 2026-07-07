@@ -1,4 +1,4 @@
-import { App, PluginSettingTab, Setting } from 'obsidian';
+import { App, PluginSettingTab, Setting, setIcon } from 'obsidian';
 import type PluginTogglePlugin from './main';
 
 export interface PluginToggleSettings {
@@ -54,6 +54,13 @@ export class PluginToggleSettingTab extends PluginSettingTab {
         const indicator = setting.settingEl.createEl('span', { cls: 'plugin-toggle-indicator' });
         setting.settingEl.prepend(indicator);
 
+        const gearIcon = setting.controlEl.createEl('span', { cls: 'plugin-toggle-gear' });
+        setIcon(gearIcon, 'settings');
+        gearIcon.setAttribute('aria-label', 'Plugin settings');
+        gearIcon.addEventListener('click', () => {
+          (this.app as any).setting.openTabById(id);
+        });
+
         setting.addToggle((toggle) =>
           toggle
             .setValue(this.plugin.settings.managedPlugins.includes(id))
@@ -65,15 +72,6 @@ export class PluginToggleSettingTab extends PluginSettingTab {
                 if (idx !== -1) this.plugin.settings.managedPlugins.splice(idx, 1);
               }
               await this.plugin.saveSettings();
-            }),
-        );
-
-        setting.addButton((btn) =>
-          btn
-            .setIcon('settings')
-            .setTooltip('Plugin settings')
-            .onClick(() => {
-              (this.app as any).setting.openTabById(id);
             }),
         );
       });

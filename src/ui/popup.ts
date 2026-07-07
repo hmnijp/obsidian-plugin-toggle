@@ -1,4 +1,4 @@
-import { Setting } from 'obsidian';
+import { Setting, setIcon } from 'obsidian';
 import type PluginTogglePlugin from '../main';
 
 export class PluginTogglePopup {
@@ -33,8 +33,20 @@ export class PluginTogglePopup {
       const isEnabled = enabledPlugins.has(id);
 
       const setting = new Setting(this.containerEl)
-        .setName(manifest.name || id)
-        .addToggle((toggle) =>
+        .setName(manifest.name || id);
+
+      const gearIcon = setting.controlEl.createEl('span', { cls: 'plugin-toggle-gear' });
+      setIcon(gearIcon, 'settings');
+      gearIcon.setAttribute('aria-label', 'Plugin settings');
+      gearIcon.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const setting = (this.plugin.app as any).setting;
+        setting.open();
+        setting.openTabById(id);
+        this.close();
+      });
+
+      setting.addToggle((toggle) =>
           toggle
             .setValue(isEnabled)
             .onChange(async (value) => {
@@ -47,17 +59,6 @@ export class PluginTogglePopup {
               setting.settingEl.removeClass('plugin-toggle-enabled');
               setting.settingEl.removeClass('plugin-toggle-disabled');
               setting.settingEl.addClass(value ? 'plugin-toggle-enabled' : 'plugin-toggle-disabled');
-            }),
-        )
-        .addButton((btn) =>
-          btn
-            .setIcon('settings')
-            .setTooltip('Plugin settings')
-            .onClick(() => {
-              const setting = (this.plugin.app as any).setting;
-              setting.open();
-              setting.openTabById(id);
-              this.close();
             }),
         );
 

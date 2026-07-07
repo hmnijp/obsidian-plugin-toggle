@@ -27,6 +27,17 @@
   font-size: var(--font-ui-medium);
 }
 
+.plugin-toggle-gear {
+  display: inline-flex;
+  align-items: center;
+  opacity: 0.4;
+  cursor: pointer;
+  padding: 0 4px;
+}
+.plugin-toggle-gear:hover {
+  opacity: 0.8;
+}
+
 .plugin-toggle-popup .setting-item-description {
   display: none;
 }

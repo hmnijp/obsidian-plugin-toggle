@@ -54,7 +54,7 @@
 }
 
 .plugin-toggle-enabled .plugin-toggle-indicator {
-  background-color: var(--color-green);
+  background-color: #4caf50;
 }
 
 .plugin-toggle-disabled .plugin-toggle-indicator {

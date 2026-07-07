@@ -1,6 +1,6 @@
 # Plugin Toggle
 
-Enable and disable plugins from the status bar.
+Quickly enable and disable Obsidian plugins from the status bar.
 
 ## Features
 

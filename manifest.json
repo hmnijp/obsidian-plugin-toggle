@@ -1,9 +1,9 @@
 {
   "id": "obsidian-plugin-toggle",
   "name": "Plugin Toggle",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "minAppVersion": "1.11.0",
-  "description": "Quickly enable and disable plugins from the status bar",
+  "description": "Quickly enable and disable Obsidian plugins from the status bar",
   "author": "hmnijp",
   "authorUrl": "https://github.com/hmnijp/",
   "isDesktopOnly": false

@@ -3,7 +3,7 @@ import { type PluginToggleSettings, DEFAULT_SETTINGS, PluginToggleSettingTab } f
 import { PluginTogglePopup } from './ui/popup';
 
 export default class PluginTogglePlugin extends Plugin {
-  settings: PluginToggleSettings;
+  settings!: PluginToggleSettings;
   popup: PluginTogglePopup | null = null;
   registeredPluginIds: string[] = [];
 
@@ -18,7 +18,7 @@ export default class PluginTogglePlugin extends Plugin {
 
     this.addCommand({
       id: this.getPluginCommandId(pluginId),
-      name: `Plugin Toggle: ${name}`,
+      name: `Toggle: ${name}`,
       callback: async () => {
         const plugins = (this.app as any).plugins;
         if (plugins.enabledPlugins.has(pluginId)) {
@@ -50,7 +50,7 @@ export default class PluginTogglePlugin extends Plugin {
 
     this.addCommand({
       id: 'open-overlay',
-      name: 'Open plugin toggle overlay',
+      name: 'Open overlay',
       callback: () => this.togglePopup(),
     });
 

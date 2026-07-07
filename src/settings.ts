@@ -51,10 +51,10 @@ export class PluginToggleSettingTab extends PluginSettingTab {
           setting.settingEl.addClass('plugin-toggle-disabled');
         }
 
-        const indicator = setting.settingEl.createEl('span', { cls: 'plugin-toggle-indicator' });
+        const indicator = setting.settingEl.createSpan({ cls: 'plugin-toggle-indicator' });
         setting.settingEl.prepend(indicator);
 
-        const gearIcon = setting.controlEl.createEl('span', { cls: 'plugin-toggle-gear' });
+        const gearIcon = setting.controlEl.createSpan({ cls: 'plugin-toggle-gear' });
         setIcon(gearIcon, 'settings');
         gearIcon.setAttribute('aria-label', 'Plugin settings');
         gearIcon.addEventListener('click', () => {

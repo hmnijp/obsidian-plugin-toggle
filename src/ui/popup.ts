@@ -4,15 +4,15 @@ import type PluginTogglePlugin from '../main';
 export class PluginTogglePopup {
   plugin: PluginTogglePlugin;
   containerEl!: HTMLElement;
-  private closeHandler: (e: MouseEvent) => void;
-  private keydownHandler: (e: KeyboardEvent) => void;
+  private closeHandler!: (e: MouseEvent) => void;
+  private keydownHandler!: (e: KeyboardEvent) => void;
 
   constructor(plugin: PluginTogglePlugin) {
     this.plugin = plugin;
   }
 
   open() {
-    this.containerEl = document.body.createEl('div', { cls: 'plugin-toggle-popup' });
+    this.containerEl = document.body.createDiv({ cls: 'plugin-toggle-popup' });
 
     const manifests = (this.plugin.app as any).plugins.manifests as Record<string, any>;
     const enabledPlugins = (this.plugin.app as any).plugins.enabledPlugins as Set<string>;
@@ -35,7 +35,7 @@ export class PluginTogglePopup {
       const setting = new Setting(this.containerEl)
         .setName(manifest.name || id);
 
-      const gearIcon = setting.controlEl.createEl('span', { cls: 'plugin-toggle-gear' });
+      const gearIcon = setting.controlEl.createSpan({ cls: 'plugin-toggle-gear' });
       setIcon(gearIcon, 'settings');
       gearIcon.setAttribute('aria-label', 'Plugin settings');
       gearIcon.addEventListener('click', (e) => {
@@ -69,7 +69,7 @@ export class PluginTogglePopup {
       }
     }
 
-    setTimeout(() => {
+    window.setTimeout(() => {
       const firstToggle = this.containerEl.querySelector('.checkbox-container');
       (firstToggle as HTMLElement)?.focus();
     }, 0);
@@ -99,7 +99,7 @@ export class PluginTogglePopup {
       }
     };
 
-    setTimeout(() => {
+    window.setTimeout(() => {
       document.addEventListener('click', this.closeHandler);
     }, 0);
     document.addEventListener('keydown', this.keydownHandler);

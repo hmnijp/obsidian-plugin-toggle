@@ -48,6 +48,17 @@ export class PluginTogglePopup {
               setting.settingEl.removeClass('plugin-toggle-disabled');
               setting.settingEl.addClass(value ? 'plugin-toggle-enabled' : 'plugin-toggle-disabled');
             }),
+        )
+        .addButton((btn) =>
+          btn
+            .setIcon('settings')
+            .setTooltip('Plugin settings')
+            .onClick(() => {
+              const setting = (this.plugin.app as any).setting;
+              setting.open();
+              setting.openTabById(id);
+              this.close();
+            }),
         );
 
       if (isEnabled) {

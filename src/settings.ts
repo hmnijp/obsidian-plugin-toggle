@@ -37,8 +37,13 @@ export class PluginToggleSettingTab extends PluginSettingTab {
         const isEnabled = enabledPlugins.has(id);
 
         const setting = new Setting(containerEl)
-          .setName(manifest.name || id)
           .setDesc(manifest.description || '');
+
+        setting.nameEl.empty();
+        setting.nameEl.createEl('a', {
+          text: manifest.name || id,
+          href: `obsidian://show-plugin?id=${id}`,
+        });
 
         if (isEnabled) {
           setting.settingEl.addClass('plugin-toggle-enabled');
@@ -66,16 +71,11 @@ export class PluginToggleSettingTab extends PluginSettingTab {
         setting.addButton((btn) =>
           btn
             .setIcon('settings')
-            .setTooltip('View details')
-            .onClick(() => this.openPluginDetails(id)),
+            .setTooltip('Plugin settings')
+            .onClick(() => {
+              (this.app as any).setting.openTabById(id);
+            }),
         );
       });
-  }
-
-  private openPluginDetails(pluginId: string): void {
-    const a = document.createElement('a');
-    a.href = `obsidian://show-plugin?id=${pluginId}`;
-    a.click();
-    a.remove();
   }
 }

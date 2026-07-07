@@ -1,4 +1,4 @@
-import { App, Modal, Plugin, PluginSettingTab, Setting, setIcon } from 'obsidian';
+import { App, Plugin, PluginSettingTab, Setting, setIcon } from 'obsidian';
 
 interface PluginToggleSettings {
   managedPlugins: string[];
@@ -10,7 +10,7 @@ const DEFAULT_SETTINGS: PluginToggleSettings = {
 
 export default class PluginTogglePlugin extends Plugin {
   settings: PluginToggleSettings;
-  modal: PluginToggleModal | null = null;
+  popup: PluginTogglePopup | null = null;
 
   async onload() {
     await this.loadSettings();
@@ -18,23 +18,23 @@ export default class PluginTogglePlugin extends Plugin {
     this.addCommand({
       id: 'open-plugin-toggle',
       name: 'Open plugin toggle overlay',
-      callback: () => this.toggleModal(),
+      callback: () => this.togglePopup(),
     });
 
     const item = this.addStatusBarItem();
     setIcon(item, 'puzzle');
     item.setAttribute('aria-label', 'Toggle plugins');
-    item.addEventListener('click', () => this.toggleModal());
+    item.addEventListener('click', () => this.togglePopup());
 
     this.addSettingTab(new PluginToggleSettingTab(this.app, this));
   }
 
-  toggleModal() {
-    if (this.modal) {
-      this.modal.close();
+  togglePopup() {
+    if (this.popup) {
+      this.popup.close();
     } else {
-      this.modal = new PluginToggleModal(this.app, this);
-      this.modal.open();
+      this.popup = new PluginTogglePopup(this.app, this);
+      this.popup.open();
     }
   }
 
@@ -117,27 +117,25 @@ class PluginToggleSettingTab extends PluginSettingTab {
   }
 }
 
-class PluginToggleModal extends Modal {
+class PluginTogglePopup {
   plugin: PluginTogglePlugin;
+  containerEl!: HTMLElement;
+  private closeHandler: (e: MouseEvent) => void;
+  private keydownHandler: (e: KeyboardEvent) => void;
 
   constructor(app: App, plugin: PluginTogglePlugin) {
-    super(app);
     this.plugin = plugin;
-    this.setTitle('Plugin Toggle');
-    (this as any).setDimBackground(false);
   }
 
-  onOpen() {
-    const { contentEl, modalEl } = this;
-    modalEl.addClass('plugin-toggle-modal');
-    modalEl.parentElement?.querySelector('.modal-close-button')?.addClass('is-hidden');
+  open() {
+    this.containerEl = document.body.createEl('div', { cls: 'plugin-toggle-popup' });
 
-    const manifests = (this.app as any).plugins.manifests as Record<string, any>;
-    const enabledPlugins = (this.app as any).plugins.enabledPlugins as Set<string>;
+    const manifests = (this.plugin.app as any).plugins.manifests as Record<string, any>;
+    const enabledPlugins = (this.plugin.app as any).plugins.enabledPlugins as Set<string>;
     const ids = this.plugin.settings.managedPlugins;
 
     if (ids.length === 0) {
-      contentEl.createEl('p', { text: 'No plugins selected. Configure in settings.' });
+      this.containerEl.createEl('p', { text: 'No plugins selected. Configure in settings.' });
       return;
     }
 
@@ -147,13 +145,13 @@ class PluginToggleModal extends Modal {
 
       const isEnabled = enabledPlugins.has(id);
 
-      new Setting(contentEl)
+      new Setting(this.containerEl)
         .setName(manifest.name || id)
         .addToggle((toggle) =>
           toggle
             .setValue(isEnabled)
             .onChange(async (value) => {
-              const plugins = (this.app as any).plugins;
+              const plugins = (this.plugin.app as any).plugins;
               if (value) {
                 await plugins.enablePluginAndSave(id);
               } else {
@@ -162,11 +160,29 @@ class PluginToggleModal extends Modal {
             }),
         );
     }
+
+    this.closeHandler = (e: MouseEvent) => {
+      if (this.containerEl && !this.containerEl.contains(e.target as Node)) {
+        this.close();
+      }
+    };
+
+    this.keydownHandler = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        this.close();
+      }
+    };
+
+    setTimeout(() => {
+      document.addEventListener('click', this.closeHandler);
+    }, 0);
+    document.addEventListener('keydown', this.keydownHandler);
   }
 
-  onClose() {
-    const { contentEl } = this;
-    contentEl.empty();
-    this.plugin.modal = null;
+  close() {
+    document.removeEventListener('click', this.closeHandler);
+    document.removeEventListener('keydown', this.keydownHandler);
+    this.containerEl?.remove();
+    this.plugin.popup = null;
   }
 }

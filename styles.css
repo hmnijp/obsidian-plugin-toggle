@@ -1,40 +1,32 @@
-.modal.plugin-toggle-modal {
+.plugin-toggle-popup {
   position: fixed;
   top: unset;
   left: unset;
   bottom: calc(var(--status-bar-height, 32px) + var(--size-4-2));
   right: var(--size-4-2);
-  transform: none;
   width: max-content;
   min-width: 200px;
   max-width: 400px;
+  max-height: 400px;
+  overflow-y: auto;
+  background: var(--modal-background, var(--background-primary));
+  border: 1px solid var(--modal-border-color, var(--background-modifier-border));
+  border-radius: var(--modal-radius, var(--radius-m));
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  z-index: var(--layer-popover, 100);
 }
 
-.plugin-toggle-modal .modal-header {
-  display: none;
-}
-
-.modal-container:has(.plugin-toggle-modal) > .modal-close-button,
-.modal-close-button.is-hidden {
-  display: none;
-}
-
-.plugin-toggle-modal .setting-item {
+.plugin-toggle-popup .setting-item {
   padding: var(--size-4-1) var(--size-4-2);
   border-bottom: none;
 }
 
-.plugin-toggle-modal .setting-item-name {
+.plugin-toggle-popup .setting-item-name {
   font-size: var(--font-ui-small);
 }
 
-.plugin-toggle-modal .setting-item-description {
+.plugin-toggle-popup .setting-item-description {
   display: none;
-}
-
-.plugin-toggle-modal .modal-content {
-  overflow-y: auto;
-  max-height: 400px;
 }
 
 .plugin-toggle-settings-desc {

@@ -74,7 +74,8 @@ class PluginToggleSettingTab extends PluginSettingTab {
         const isEnabled = enabledPlugins.has(id);
 
         const setting = new Setting(containerEl)
-          .setName(manifest.name || id);
+          .setName(manifest.name || id)
+          .setDesc(manifest.description || '');
 
         if (isEnabled) {
           setting.settingEl.addClass('plugin-toggle-enabled');
@@ -82,14 +83,8 @@ class PluginToggleSettingTab extends PluginSettingTab {
           setting.settingEl.addClass('plugin-toggle-disabled');
         }
 
-        const descEl = new DocumentFragment();
-        const statusEm = document.createElement('em');
-        statusEm.textContent = isEnabled ? 'Enabled' : 'Disabled';
-        descEl.appendChild(statusEm);
-        if (manifest.description) {
-          descEl.append(` — ${manifest.description}`);
-        }
-        setting.setDesc(descEl);
+        const indicator = setting.settingEl.createEl('span', { cls: 'plugin-toggle-indicator' });
+        setting.settingEl.prepend(indicator);
 
         setting.addToggle((toggle) =>
           toggle
@@ -129,11 +124,13 @@ class PluginToggleModal extends Modal {
     super(app);
     this.plugin = plugin;
     this.setTitle('Plugin Toggle');
+    (this as any).setDimBackground(false);
   }
 
   onOpen() {
     const { contentEl, modalEl } = this;
     modalEl.addClass('plugin-toggle-modal');
+    modalEl.parentElement?.querySelector('.modal-close-button')?.addClass('is-hidden');
 
     const manifests = (this.app as any).plugins.manifests as Record<string, any>;
     const enabledPlugins = (this.app as any).plugins.enabledPlugins as Set<string>;

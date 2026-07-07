@@ -2,7 +2,7 @@
   position: fixed;
   top: unset;
   left: unset;
-  bottom: var(--size-4-2);
+  bottom: calc(var(--status-bar-height, 32px) + var(--size-4-2));
   right: var(--size-4-2);
   transform: none;
   width: max-content;
@@ -11,6 +11,11 @@
 }
 
 .plugin-toggle-modal .modal-header {
+  display: none;
+}
+
+.modal-container:has(.plugin-toggle-modal) > .modal-close-button,
+.modal-close-button.is-hidden {
   display: none;
 }
 
@@ -36,6 +41,24 @@
   margin-bottom: var(--size-4-4);
   color: var(--text-muted);
   font-size: var(--font-ui-smaller);
+}
+
+.plugin-toggle-indicator {
+  display: inline-block;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: var(--size-4-2);
+  align-self: center;
+  flex-shrink: 0;
+}
+
+.plugin-toggle-enabled .plugin-toggle-indicator {
+  background-color: var(--color-green);
+}
+
+.plugin-toggle-disabled .plugin-toggle-indicator {
+  background-color: var(--text-muted);
 }
 
 .plugin-toggle-disabled .setting-item-name,

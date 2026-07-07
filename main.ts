@@ -56,30 +56,69 @@ class PluginToggleSettingTab extends PluginSettingTab {
     this.icon = 'puzzle';
   }
 
-  getSettingDefinitions(): any[] {
-    const manifests = (this.app as any).plugins.manifests as Record<string, any>;
+  display(): void {
+    const { containerEl } = this;
+    containerEl.empty();
 
-    return Object.entries(manifests)
+    containerEl.createEl('p', {
+      text: 'Select plugins that will appear in the quick toggle popup. Only checked plugins are shown in the status bar overlay.',
+      cls: 'plugin-toggle-settings-desc',
+    });
+
+    const manifests = (this.app as any).plugins.manifests as Record<string, any>;
+    const enabledPlugins = (this.app as any).plugins.enabledPlugins as Set<string>;
+
+    Object.entries(manifests)
       .filter(([id]) => id !== 'plugin-toggle')
-      .map(([id, manifest]) => ({
-        name: manifest.name || id,
-        desc: id,
-        render: (setting: Setting) => {
-          setting.addToggle((toggle) =>
-            toggle
-              .setValue(this.plugin.settings.managedPlugins.includes(id))
-              .onChange(async (value) => {
-                if (value) {
-                  this.plugin.settings.managedPlugins.push(id);
-                } else {
-                  const idx = this.plugin.settings.managedPlugins.indexOf(id);
-                  if (idx !== -1) this.plugin.settings.managedPlugins.splice(idx, 1);
-                }
-                await this.plugin.saveSettings();
-              }),
-          );
-        },
-      }));
+      .forEach(([id, manifest]) => {
+        const isEnabled = enabledPlugins.has(id);
+
+        const setting = new Setting(containerEl)
+          .setName(manifest.name || id);
+
+        if (isEnabled) {
+          setting.settingEl.addClass('plugin-toggle-enabled');
+        } else {
+          setting.settingEl.addClass('plugin-toggle-disabled');
+        }
+
+        const descEl = new DocumentFragment();
+        const statusEm = document.createElement('em');
+        statusEm.textContent = isEnabled ? 'Enabled' : 'Disabled';
+        descEl.appendChild(statusEm);
+        if (manifest.description) {
+          descEl.append(` — ${manifest.description}`);
+        }
+        setting.setDesc(descEl);
+
+        setting.addToggle((toggle) =>
+          toggle
+            .setValue(this.plugin.settings.managedPlugins.includes(id))
+            .onChange(async (value) => {
+              if (value) {
+                this.plugin.settings.managedPlugins.push(id);
+              } else {
+                const idx = this.plugin.settings.managedPlugins.indexOf(id);
+                if (idx !== -1) this.plugin.settings.managedPlugins.splice(idx, 1);
+              }
+              await this.plugin.saveSettings();
+            }),
+        );
+
+        setting.addButton((btn) =>
+          btn
+            .setIcon('settings')
+            .setTooltip('View details')
+            .onClick(() => this.openPluginDetails(id)),
+        );
+      });
+  }
+
+  private openPluginDetails(pluginId: string): void {
+    const a = document.createElement('a');
+    a.href = `obsidian://show-plugin?id=${pluginId}`;
+    a.click();
+    a.remove();
   }
 }
 
@@ -93,7 +132,9 @@ class PluginToggleModal extends Modal {
   }
 
   onOpen() {
-    const { contentEl } = this;
+    const { contentEl, modalEl } = this;
+    modalEl.addClass('plugin-toggle-modal');
+
     const manifests = (this.app as any).plugins.manifests as Record<string, any>;
     const enabledPlugins = (this.app as any).plugins.enabledPlugins as Set<string>;
     const ids = this.plugin.settings.managedPlugins;
@@ -111,7 +152,6 @@ class PluginToggleModal extends Modal {
 
       new Setting(contentEl)
         .setName(manifest.name || id)
-        .setDesc(id)
         .addToggle((toggle) =>
           toggle
             .setValue(isEnabled)

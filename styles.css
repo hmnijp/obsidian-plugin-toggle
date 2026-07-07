@@ -1,0 +1,44 @@
+.modal.plugin-toggle-modal {
+  position: fixed;
+  top: unset;
+  left: unset;
+  bottom: var(--size-4-2);
+  right: var(--size-4-2);
+  transform: none;
+  width: max-content;
+  min-width: 200px;
+  max-width: 400px;
+}
+
+.plugin-toggle-modal .modal-header {
+  display: none;
+}
+
+.plugin-toggle-modal .setting-item {
+  padding: var(--size-4-1) var(--size-4-2);
+  border-bottom: none;
+}
+
+.plugin-toggle-modal .setting-item-name {
+  font-size: var(--font-ui-small);
+}
+
+.plugin-toggle-modal .setting-item-description {
+  display: none;
+}
+
+.plugin-toggle-modal .modal-content {
+  overflow-y: auto;
+  max-height: 400px;
+}
+
+.plugin-toggle-settings-desc {
+  margin-bottom: var(--size-4-4);
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+}
+
+.plugin-toggle-disabled .setting-item-name,
+.plugin-toggle-disabled .setting-item-description {
+  opacity: 0.5;
+}

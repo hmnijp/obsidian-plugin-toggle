@@ -1,6 +1,6 @@
 {
   "name": "obsidian-plugin-toggle",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Quickly enable and disable plugins from the status bar",
   "main": "main.js",
   "type": "module",

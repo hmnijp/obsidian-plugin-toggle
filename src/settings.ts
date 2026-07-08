@@ -1,12 +1,17 @@
 import { App, PluginSettingTab, Setting, setIcon } from 'obsidian';
 import type PluginTogglePlugin from './main';
 
+export interface PluginEntry {
+  toggle: boolean;
+  hotkeys: { modifiers: string | null; key: string | null }[];
+}
+
 export interface PluginToggleSettings {
-  managedPlugins: string[];
+  managedPlugins: Record<string, PluginEntry>;
 }
 
 export const DEFAULT_SETTINGS: PluginToggleSettings = {
-  managedPlugins: [],
+  managedPlugins: {},
 };
 
 export class PluginToggleSettingTab extends PluginSettingTab {
@@ -63,14 +68,13 @@ export class PluginToggleSettingTab extends PluginSettingTab {
 
         setting.addToggle((toggle) =>
           toggle
-            .setValue(this.plugin.settings.managedPlugins.includes(id))
+            .setValue(this.plugin.settings.managedPlugins[id]?.toggle ?? false)
             .onChange(async (value) => {
-              if (value) {
-                this.plugin.settings.managedPlugins.push(id);
-              } else {
-                const idx = this.plugin.settings.managedPlugins.indexOf(id);
-                if (idx !== -1) this.plugin.settings.managedPlugins.splice(idx, 1);
-              }
+              const existing = this.plugin.settings.managedPlugins[id];
+              this.plugin.settings.managedPlugins[id] = {
+                toggle: value,
+                hotkeys: existing?.hotkeys || [],
+              };
               await this.plugin.saveSettings();
             }),
         );

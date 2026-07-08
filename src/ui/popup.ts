@@ -17,8 +17,9 @@ export class PluginTogglePopup {
     const manifests = (this.plugin.app as any).plugins.manifests as Record<string, any>;
     const enabledPlugins = (this.plugin.app as any).plugins.enabledPlugins as Set<string>;
 
-    const ids = this.plugin.settings.managedPlugins
-      .map(id => ({ id, manifest: manifests[id] }))
+    const ids = Object.entries(this.plugin.settings.managedPlugins)
+      .filter(([_, entry]) => entry.toggle)
+      .map(([id]) => ({ id, manifest: manifests[id] }))
       .filter(x => x.manifest)
       .sort((a, b) => a.manifest.name.localeCompare(b.manifest.name))
       .map(x => x.id);

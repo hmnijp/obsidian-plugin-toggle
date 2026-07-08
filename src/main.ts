@@ -1,5 +1,5 @@
 import { Plugin, setIcon } from 'obsidian';
-import { type PluginToggleSettings, DEFAULT_SETTINGS, PluginToggleSettingTab } from './settings';
+import { type PluginToggleSettings, type PluginEntry, DEFAULT_SETTINGS, PluginToggleSettingTab } from './settings';
 import { PluginTogglePopup } from './ui/popup';
 
 export default class PluginTogglePlugin extends Plugin {
@@ -9,6 +9,10 @@ export default class PluginTogglePlugin extends Plugin {
 
   private getPluginCommandId(pluginId: string): string {
     return `toggle-${pluginId}`;
+  }
+
+  private getHotkeyId(pluginId: string): string {
+    return `${this.manifest.id}:${this.getPluginCommandId(pluginId)}`;
   }
 
   private addPluginCommand(pluginId: string) {
@@ -30,6 +34,22 @@ export default class PluginTogglePlugin extends Plugin {
     });
 
     this.registeredPluginIds.push(pluginId);
+
+    const entry = this.settings.managedPlugins[pluginId];
+    if (entry?.hotkeys && entry.hotkeys.length > 0) {
+      try {
+        const km = (this.app as any).hotkeyManager;
+        if (km) {
+          const customKeys = km.customKeys as Record<string, unknown> | undefined;
+          if (customKeys) {
+            customKeys[this.getHotkeyId(pluginId)] = entry.hotkeys;
+            if (km.save) km.save();
+          }
+        }
+      } catch {
+        console.warn('Plugin Toggle: failed to restore hotkeys for', pluginId);
+      }
+    }
   }
 
   private removePluginCommand(pluginId: string) {
@@ -38,8 +58,10 @@ export default class PluginTogglePlugin extends Plugin {
   }
 
   private registerPluginCommands() {
-    for (const id of this.settings.managedPlugins) {
-      this.addPluginCommand(id);
+    for (const [id, entry] of Object.entries(this.settings.managedPlugins)) {
+      if (entry.toggle) {
+        this.addPluginCommand(id);
+      }
     }
   }
 
@@ -76,25 +98,70 @@ export default class PluginTogglePlugin extends Plugin {
   }
 
   async loadSettings() {
-    this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
+    const data = await this.loadData() as Record<string, unknown> | undefined;
+    if (data && Array.isArray(data.managedPlugins)) {
+      const managedPlugins: Record<string, PluginEntry> = {};
+      const arr = data.managedPlugins as string[];
+      const oldHotkeys = (data.pluginHotkeys as Record<string, { modifiers: string | null; key: string | null }[]> | undefined) ?? {};
+      for (const id of arr) {
+        managedPlugins[id] = { toggle: true, hotkeys: oldHotkeys[id] ?? [] };
+      }
+      this.settings = { managedPlugins };
+    } else {
+      this.settings = Object.assign({}, DEFAULT_SETTINGS, data);
+    }
   }
 
   async saveSettings() {
-    const currentIds = new Set(this.registeredPluginIds);
-    const newIds = new Set(this.settings.managedPlugins);
+    await this.reloadHotkeysFromFile();
 
-    for (const id of currentIds) {
-      if (!newIds.has(id)) {
-        this.removePluginCommand(id);
+    for (const id of this.registeredPluginIds) {
+      try {
+        const km = (this.app as any).hotkeyManager;
+        if (km?.customKeys) {
+          const hotkeys = km.customKeys[this.getHotkeyId(id)] as { modifiers: string | null; key: string | null }[] | undefined;
+          if (hotkeys && hotkeys.length > 0) {
+            const entry = this.settings.managedPlugins[id];
+            if (entry) {
+              entry.hotkeys = JSON.parse(JSON.stringify(hotkeys));
+            }
+          }
+        }
+      } catch {
+        console.warn('Plugin Toggle: failed to save hotkeys for', id);
       }
     }
 
-    for (const id of newIds) {
-      if (!currentIds.has(id)) {
-        this.addPluginCommand(id);
+    for (const [id, entry] of Object.entries(this.settings.managedPlugins)) {
+      if (entry.toggle) {
+        if (!this.registeredPluginIds.includes(id)) {
+          this.addPluginCommand(id);
+        }
+      } else {
+        if (this.registeredPluginIds.includes(id)) {
+          this.removePluginCommand(id);
+        }
       }
     }
 
     await this.saveData(this.settings);
+  }
+
+  async reloadHotkeysFromFile() {
+    try {
+      const fileData = await this.loadData() as Record<string, unknown> | undefined;
+      if (fileData?.managedPlugins && typeof fileData.managedPlugins === 'object' && !Array.isArray(fileData.managedPlugins)) {
+        for (const [id, fileEntry] of Object.entries(fileData.managedPlugins as Record<string, unknown>)) {
+          const fe = fileEntry as Record<string, unknown>;
+          const fileHotkeys = fe.hotkeys as { modifiers: string | null; key: string | null }[] | undefined;
+          if (fileHotkeys?.length) {
+            const current = this.settings.managedPlugins[id];
+            if (current) {
+              current.hotkeys = JSON.parse(JSON.stringify(fileHotkeys));
+            }
+          }
+        }
+      }
+    } catch {}
   }
 }

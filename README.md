@@ -9,6 +9,8 @@ Quickly enable and disable Obsidian plugins from the status bar.
 - Settings tab to choose which plugins appear in the popup
 - Optional keyboard shortcut (assignable in **Settings → Hotkeys**)
 
+![screenshot](screenshot.webp)
+
 ## Usage
 
 1. Open **Settings → Plugin Toggle**.
